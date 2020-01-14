@@ -15,6 +15,8 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
+        self.count = 0
+        self.resized = False
 
 
     def _hash(self, key):
@@ -32,9 +34,14 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
-
-
+        # ref: https://gist.github.com/mengzhuo/180cd6be8ba9e2743753
+        hash = 5381
+        for x in key:
+            hash_value = (( hash << 5) + hash_value) + x
+            # hash_value = (( hash << 5) + hash_value) + ord(x)
+        return hash_value
+        # pass                  
+    
     def _hash_mod(self, key):
         '''
         Take an arbitrary key and return a valid integer index
@@ -51,9 +58,12 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
 
-
+        if self.storage[index] is not None:
+            print(f'WARNING: overwritting data at {index}')
+        self.storage[index] = LinkedPair(key, value)
+        # pass
 
     def remove(self, key):
         '''
@@ -63,7 +73,12 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        if self.storage[index] is None:
+            print(f'WARNING: Key not found')
+
+        self.storage[index] = None
+        # pass
 
 
     def retrieve(self, key):
@@ -84,7 +99,16 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        self.capacity = self.capacity * 3 #6 tested and working
+        prev = self.storage
+        self.storage = [None] * self.capacity
+        x = None
+
+        for x in prev:
+            while x is not None:
+                self.insert(x.key, x.value)
+                x = x.next
+        # pass
 
 
 
